@@ -27,17 +27,30 @@ COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 COPY . /var/www
 COPY --chown=www-data:www-data . /var/www
 
-RUN chmod -R 755 /var/www
+# Créer les répertoires de stockage Laravel et définir les permissions
+RUN mkdir -p /var/www/storage/logs \
+    && mkdir -p /var/www/storage/framework/cache \
+    && mkdir -p /var/www/storage/framework/sessions \
+    && mkdir -p /var/www/storage/framework/views \
+    && mkdir -p /var/www/bootstrap/cache \
+    && chown -R www-data:www-data /var/www/storage \
+    && chown -R www-data:www-data /var/www/bootstrap/cache \
+    && chmod -R 775 /var/www/storage \
+    && chmod -R 775 /var/www/bootstrap/cache
 
 # Installer dépendances Laravel
 RUN composer install --no-dev --optimize-autoloader
 
-# Générer la clé Laravel
-COPY .env.example .env
+# Copier le fichier .env et générer la clé
+COPY .env .env
 RUN php artisan key:generate
-RUN php artisan optimize:clear
 
 EXPOSE 8000
 
-# Lancer migrations + serveur
-CMD php artisan migrate --force && php artisan serve --host=0.0.0.0 --port=8000
+# Lancer migrations, créer la table de sessions et démarrer le serveur
+CMD php artisan migrate --force && \
+    php artisan session:table && \
+    php artisan migrate --force && \
+    php artisan cache:clear && \
+    php artisan config:clear && \
+    php artisan serve --host=0.0.0.0 --port=8000
