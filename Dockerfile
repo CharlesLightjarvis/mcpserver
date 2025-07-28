@@ -42,7 +42,7 @@ RUN mkdir -p /var/www/storage/logs \
 RUN composer install --no-dev --optimize-autoloader
 
 # Copier le fichier .env et générer la clé
-COPY .env .env
+COPY .env.example .env
 RUN php artisan key:generate
 
 EXPOSE 8000
