@@ -3,8 +3,8 @@ FROM php:8.2-fpm
 WORKDIR /var/www
 
 RUN apt-get update && apt-get install -y \
-    zip unzip curl git libxml2-dev libzip-dev libpng-dev libjpeg-dev libonig-dev \
-    sqlite3 libsqlite3-dev
+    libpq-dev unzip git curl \
+    && docker-php-ext-install pdo pdo_pgsql
 
 RUN docker-php-ext-install pdo pdo_mysql mbstring exif pcntl bcmath gd zip
 
