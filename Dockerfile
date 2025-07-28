@@ -35,6 +35,7 @@ RUN composer install --no-dev --optimize-autoloader
 # Générer la clé Laravel
 COPY .env.example .env
 RUN php artisan key:generate
+RUN php artisan optimize:clear
 
 EXPOSE 8000
 
