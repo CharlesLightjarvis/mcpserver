@@ -18,6 +18,7 @@ RUN composer install
 
 COPY .env.example .env
 RUN php artisan key:generate
+RUN php artisan migrate
 
 EXPOSE 8000
 CMD php artisan serve --host=0.0.0.0 --port=8000
